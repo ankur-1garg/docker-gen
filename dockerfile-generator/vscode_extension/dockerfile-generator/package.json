@@ -20,7 +20,17 @@
         "title": "MCP DockerGen: Generate Dockerfile",
         "category": "MCP DockerGen"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "MCP Dockerfile Generator",
+      "properties": {
+        "mcp-dockerfile-generator.serverUrl": {
+          "type": "string",
+          "default": "http://localhost:8000",
+          "description": "The base URL of the MCP Dockerfile Generator server API (e.g., http://mcp-server.internal:8000)."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

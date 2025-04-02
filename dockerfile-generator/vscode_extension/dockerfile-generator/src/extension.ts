@@ -1,37 +1,115 @@
 // vscode_extension/src/extension.ts
 
-// The module 'vscode' contains the VS Code extensibility API
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
+import { getServerUrl } from "./utils/configuration";
+// Import the API service function
+import { generateDockerfileFromServer } from "./services/apiService";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  console.log('Extension "mcp-dockerfile-generator" active!');
 
-    console.log('Congratulations, your extension "mcp-dockerfile-generator" is now active!');
+  let disposable = vscode.commands.registerCommand(
+    "mcp-dockerfile-generator.generate",
+    async () => {
+      const serverUrl = getServerUrl();
+      // Remove the initial message or keep it brief
+      // vscode.window.showInformationMessage(`Using MCP Server URL: ${serverUrl}`);
 
-    // The command has been defined in the package.json file
-    // Now provide the implementation with registerCommand
-    // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('mcp-dockerfile-generator.generate', () => {
-        // The code you place here will be executed every time your command is executed
+      // --- Gather User Input (Keep code from Day 16) ---
+      const language = await vscode.window.showInputBox({
+        /* ... */
+      });
+      if (language === undefined) {
+        return;
+      } // Exit if cancelled
+      const version = await vscode.window.showInputBox({
+        /* ... */
+      });
+      const dependencies = await vscode.window.showInputBox({
+        /* ... */
+      });
+      const portStr = await vscode.window.showInputBox({
+        /* ... */
+      });
+      const port = portStr ? parseInt(portStr, 10) : undefined;
+      const additionalInstructions = await vscode.window.showInputBox({
+        /* ... */
+      });
 
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Hello from MCP Dockerfile Generator!');
+      // --- Prepare Payload ---
+      const dependenciesList = dependencies
+        ? dependencies
+            .split(",")
+            .map((d: string) => d.trim())
+            .filter((d: string) => d.length > 0)
+        : undefined;
 
-        // --- Placeholder for Day 16/17 ---
-        console.log("TODO Day 16: Get user input (language, version, etc.)");
-        console.log("TODO Day 16: Read configuration (server URL)");
-        console.log("TODO Day 17: Call MCP Server API");
-        console.log("TODO Day 17: Display result in new editor");
-        // --- End Placeholder ---
-    });
+      const payload = {
+        language: language.trim(), // Ensure language has no extra spaces
+        // Send null if version/deps/port/instructions are empty strings or undefined
+        version: version || undefined, // Use || undefined to handle empty string from input
+        dependencies: dependenciesList, // Already undefined if no input
+        port: port, // Already undefined if no input
+        // app_type: undefined, // Add if needed
+        additional_instructions: additionalInstructions || undefined,
+      };
 
-    // Add the command disposable to the context subscriptions
-    // This ensures the command is cleaned up when the extension is deactivated
-    context.subscriptions.push(disposable);
+      // --- Call API and Handle Response ---
+      try {
+        // Show some progress indication
+        await vscode.window.withProgress(
+          {
+            location: vscode.ProgressLocation.Notification,
+            title: "Generating Dockerfile via MCP Server...",
+            cancellable: false, // Making it cancellable adds complexity
+          },
+          async (progress) => {
+            progress.report({ increment: 0, message: "Calling API..." });
+
+            // Call the API Service (await the result)
+            const dockerfileContent = await generateDockerfileFromServer(
+              payload
+            );
+
+            progress.report({ increment: 50, message: "Opening result..." });
+
+            // --- Success: Show content in new editor ---
+            // Create a new untitled document with the content
+            // Setting language explicitly helps with syntax highlighting
+            const newDocument = await vscode.workspace.openTextDocument({
+              content: dockerfileContent,
+              language: "dockerfile", // Set language mode to Dockerfile
+            });
+
+            // Show the document in a new editor column
+            await vscode.window.showTextDocument(
+              newDocument,
+              vscode.ViewColumn.Beside
+            );
+
+            progress.report({ increment: 100, message: "Done." });
+            // Optional: Briefly show success message after progress disappears
+            // setTimeout(() => vscode.window.showInformationMessage('Dockerfile generated successfully!'), 500);
+          }
+        );
+      } catch (error) {
+        // --- Error: Show error message ---
+        // The error thrown by apiService should be user-friendly
+        let errorMessage = "An unknown error occurred.";
+        if (error instanceof Error) {
+          errorMessage = error.message; // Use the message from the caught error
+        }
+        console.error("Caught error in command handler:", error); // Log the full error too
+        vscode.window.showErrorMessage(
+          `Failed to generate Dockerfile: ${errorMessage}`
+        );
+      }
+    }
+  );
+
+  context.subscriptions.push(disposable);
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {
-     console.log('Extension "mcp-dockerfile-generator" is now deactivated.');
+  console.log('Extension "mcp-dockerfile-generator" deactivated.');
 }
