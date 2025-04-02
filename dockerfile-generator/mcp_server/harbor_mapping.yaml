@@ -1,0 +1,42 @@
+# mcp_server/harbor_mapping.yaml (Expanded Example)
+
+# Base URL for your Harbor registry (Ensure this is correct)
+harbor_base_url: "harbor.your-company.com"
+
+# Image mappings
+# Format: generic_image_name: harbor_specific_path (relative to base URL)
+mappings:
+  # --- Python ---
+  python: "library/python" # Base mapping
+  "python:3.11": "custom-images/python:3.11-hardened-v3" # More specific tag override
+  "python:3.11-slim": "custom-images/python:3.11-slim-hardened" # Slim variant
+  "python:3.10-slim": "custom-images/python:3.10-slim-hardened"
+  "python:3.9": "legacy/python:3.9-debian" # Older version mapping
+
+  # --- Node.js ---
+  node: "library/node" # Base mapping
+  "node:18-alpine": "custom-images/node:18-alpine-secure" # Specific alpine
+  "node:18": "custom-images/node:18-debian-secure" # Specific debian
+  "node:20-alpine": "custom-images/node:20-alpine-secure"
+
+  # --- Java (OpenJDK) ---
+  # Note: Base image names might vary (openjdk, eclipse-temurin, amazoncorretto etc.)
+  openjdk: "library/openjdk"
+  "openjdk:17-jdk-slim": "base-images/java/openjdk:17-jdk-slim-jre" # Map slim JDK generic to slim JRE specific? Org decision.
+  "openjdk:11-jre": "legacy/java/openjdk:11-jre-patched"
+
+  # --- Go ---
+  golang: "library/golang"
+  "golang:1.20-alpine": "custom-images/golang:1.20.5-alpine" # Specific patch version
+
+  # --- Base OS ---
+  alpine: "library/alpine"
+  "alpine:3.18": "custom-images/alpine-hardened:3.18.2"
+  ubuntu: "library/ubuntu"
+  "ubuntu:22.04": "custom-images/ubuntu-base:22.04-p2"
+
+  # --- Other Common Images ---
+  nginx: "library/nginx"
+  "nginx:1.23-alpine": "webservers/nginx:1.23-alpine-custom-conf"
+  redis: "library/redis"
+  "redis:7-alpine": "databases/redis:7.0.11-alpine"

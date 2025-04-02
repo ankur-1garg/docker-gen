@@ -1,0 +1,32 @@
+# mcp_server/.dockerignore
+
+# Git files
+.git
+.gitignore
+
+# Virtual environment
+venv/
+.venv/
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Test artifacts (if any generated locally)
+.pytest_cache/
+.coverage
+tests/test_mapping.yaml
+tests/shared_test_mapping.yaml
+# Any other test outputs
+
+# Local environment file (should be passed via -e or mounted)
+# .env
+
+# Temporary test scripts
+test_ai.py
+
+# IDE files
+.vscode/
+*.code-workspace

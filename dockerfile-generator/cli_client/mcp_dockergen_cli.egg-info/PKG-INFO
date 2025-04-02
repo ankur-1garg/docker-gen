@@ -1,0 +1,23 @@
+Metadata-Version: 2.4
+Name: mcp-dockergen-cli
+Version: 0.1.0
+Summary: CLI tool for generating Dockerfiles via MCP Server.
+Home-page: <your_project_repository_url>
+Author: Your Name / Team Name
+Author-email: your.email@example.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: typer[all]
+Requires-Dist: requests
+Requires-Dist: python-dotenv
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
